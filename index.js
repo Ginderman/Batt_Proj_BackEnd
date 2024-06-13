@@ -1,18 +1,42 @@
 const express = require('express');
-const bodyParser = require('body-parser')
-const app = express()
+const bodyParser = require('body-parser');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const {DatabaseClient} = require('./dababaseConnect')
 
-// Middleware
-app.use(cors());
+const app = express()
+
+
+
+app.use(cors( {credentials: true, origin: 'http://localhost:5173'}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }))
+app.use(session({
+    name: 'TestCookie',
+    secret: "to-be-changed",
+    resave: false,
+    saveUninitialized: true,
+    cookie : {
+            
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000, // 1 day
+            
+    }
+    
+}));
 
 
 
-// app.get('/', function (req, res) {
-//     res.send('Hello World')
-// })
+
+function checkCookie (req,res,next){
+    console.log('CheckCookie Middleware!');
+    console.log('Session ID:', req.sessionID);
+    console.log('Session:', req.session);
+    console.log(req.session.user);
+    next();
+}
+
 
 
 app.post('/', function (req, res) {
@@ -20,14 +44,37 @@ app.post('/', function (req, res) {
     res.send('Hit Post Route')
 })
 
-app.post('/:MechID', function (req, res) {
-    
-    const { MechID } = req.params;
-    console.log(MechID) 
-
-    console.log(req.body);
-    res.send('Hit Params Route');
+app.get('/login' , async function (req, res) {    //REMOVED MIDDLEWARE TO TEST OUT DB CONNECT
+   //const data = await dbConnect();
+   //console.log(data);
+    res.send(data)
 })
+
+app.post('/:MechID', async function (req, res) {
+    const { MechID } = req.params;
+    const {Username, Password} = req.body;
+
+    req.session.user = 'TestUser';
+    const newUser = new DatabaseClient('mongodb://localhost:27017' ,'Batt_Proj_Acc' , 'Users')
+    // await newUser.addToDB(req.body)
+    //     .then( result => {
+    //         res.send(result)
+    //         }   
+    //     )
+    await newUser.FindInDB(Username, 'Username')
+    .then( result => {
+        res.send(result)
+        }   
+    )
+    // await newUser.removeFromDB(req.body)
+    //     .then( result => {
+    //         res.send(result)
+    //         }   
+    //     )
+    //res.send('Hit Params Route, entered into DB and cookie set');
+})
+
+
 
 app.listen(3050, () => {
     console.log("Listening on port 3050!");
