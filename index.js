@@ -4,6 +4,8 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const {DatabaseClient} = require('./dababaseConnect')
+const {MechDataBaseClient} = require ('./MechDatabaseConn.js')
+const { stockMechsList } = require ('./3025MechsList.js')
 
 const app = express()
 
@@ -50,6 +52,11 @@ app.get('/login' , async function (req, res) {    //REMOVED MIDDLEWARE TO TEST O
     res.send(data)
 })
 
+app.get('/stockMechList', function (req, res) {
+    //console.log(stockMechsList)
+    res.send(stockMechsList)
+})
+
 app.post('/:MechID', async function (req, res) {
     const { MechID } = req.params;
     const {Username, Password} = req.body;
@@ -61,11 +68,16 @@ app.post('/:MechID', async function (req, res) {
     //         res.send(result)
     //         }   
     //     )
-    await newUser.FindInDB(Username, 'Username')
-    .then( result => {
-        res.send(result)
-        }   
-    )
+     await newUser.UpdateInDB('Username', Username, req.body)
+        .then( result => {
+            res.send(result)
+            }   
+        )
+    // await newUser.FindInDB(Username, 'Username')
+    // .then( result => {
+    //     res.send(result)
+    //     }   
+    // )
     // await newUser.removeFromDB(req.body)
     //     .then( result => {
     //         res.send(result)
