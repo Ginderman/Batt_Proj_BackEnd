@@ -14,30 +14,30 @@ const app = express()
 app.use(cors( {credentials: true, origin: 'http://localhost:5173'}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }))
-app.use(session({
-    name: 'TestCookie',
-    secret: "to-be-changed",
-    resave: false,
-    saveUninitialized: true,
-    cookie : {
+// app.use(session({
+//     name: 'TestCookie',
+//     secret: "to-be-changed",
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie : {
             
-            httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000, // 1 day
+//             httpOnly: true,
+//             maxAge: 24 * 60 * 60 * 1000, // 1 day
             
-    }
+//     }
     
-}));
+// }));
 
 
 
 
-function checkCookie (req,res,next){
-    console.log('CheckCookie Middleware!');
-    console.log('Session ID:', req.sessionID);
-    console.log('Session:', req.session);
-    console.log(req.session.user);
-    next();
-}
+// function checkCookie (req,res,next){
+//     console.log('CheckCookie Middleware!');
+//     console.log('Session ID:', req.sessionID);
+//     console.log('Session:', req.session);
+//     console.log(req.session.user);
+//     next();
+// }
 
 
 
